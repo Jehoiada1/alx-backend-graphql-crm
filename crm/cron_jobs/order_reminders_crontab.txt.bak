@@ -1,1 +1,0 @@
-0 8 * * * /usr/bin/env python3 /absolute/path/to/workspace/crm/cron_jobs/send_order_reminders.py >> /tmp/order_reminders_log.txt 2>&1
