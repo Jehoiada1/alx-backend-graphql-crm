@@ -26,6 +26,9 @@ class OrderType(DjangoObjectType):
 class Query(graphene.ObjectType):
     hello = graphene.String(description="Simple hello field")
     orders_recent = graphene.List(OrderType, days=graphene.Int(default_value=7), description="Pending orders within last N days")
+    customers_count = graphene.Int(name='customersCount')
+    orders_count = graphene.Int(name='ordersCount')
+    orders_revenue = graphene.Float(name='ordersRevenue')
 
     def resolve_hello(root, info):
         return "Hello from CRM!"
@@ -35,6 +38,21 @@ class Query(graphene.ObjectType):
         from datetime import timedelta
         cutoff = timezone.now() - timedelta(days=days)
         return Order.objects.select_related('customer').filter(status='pending', order_date__gte=cutoff).order_by('-order_date')
+
+    def resolve_customers_count(root, info):
+        from django.db.models import Count
+        return Customer.objects.count()
+
+    def resolve_orders_count(root, info):
+        return Order.objects.count()
+
+    def resolve_orders_revenue(root, info):
+        from django.db.models import Sum
+        # Assume Order has a field total_amount; if not, sum 0
+        if hasattr(Order, 'total_amount'):
+            agg = Order.objects.aggregate(total=Sum('total_amount'))
+            return float(agg.get('total') or 0)
+        return 0.0
 
 
 class UpdateLowStockProducts(graphene.Mutation):
