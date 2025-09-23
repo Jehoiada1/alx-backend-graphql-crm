@@ -1,0 +1,5 @@
+Django==4.2.15
+graphene-django==3.2.2
+django-crontab==0.7.1
+gql[requests]==3.5.0
+requests==2.32.3
