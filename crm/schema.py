@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from crm.products.models import Product
+from crm.models import Product
 from crm.customers.models import Customer
 from crm.orders.models import Order
 

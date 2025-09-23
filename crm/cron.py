@@ -1,4 +1,6 @@
 from django.utils import timezone
+from gql.transport.requests import RequestsHTTPTransport
+from gql import gql, Client
 
 
 def _timestamp():
@@ -7,8 +9,16 @@ def _timestamp():
 
 def log_crm_heartbeat():
     ts = _timestamp()
+    # Optionally query GraphQL hello to verify endpoint responsiveness
+    try:
+        transport = RequestsHTTPTransport(url="http://localhost:8000/graphql", verify=False)
+        client = Client(transport=transport, fetch_schema_from_transport=False)
+        result = client.execute(gql("query { hello }"))
+        hello = result.get('hello', 'unknown')
+    except Exception:
+        hello = 'unavailable'
     with open('/tmp/crm_heartbeat_log.txt', 'a') as f:
-        f.write(f"{ts} CRM is alive\n")
+        f.write(f"{ts} CRM is alive ({hello})\n")
 
 
 def update_low_stock():

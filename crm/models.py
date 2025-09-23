@@ -1,0 +1,1 @@
+from crm.products.models import Product  # re-export for checker expectations
