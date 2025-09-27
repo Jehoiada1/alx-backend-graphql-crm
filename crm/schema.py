@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 from crm.models import Product
 from crm.customers.models import Customer
 from crm.orders.models import Order
@@ -88,6 +89,7 @@ from django.utils import timezone
 from crm.customers.models import Customer
 from crm.products.models import Product
 from crm.orders.models import Order
+from .filters import CustomerFilter as CustomerFilterSet, ProductFilter as ProductFilterSet, OrderFilter as OrderFilterSet
 
 
 class CustomerNode(DjangoObjectType):
@@ -294,15 +296,10 @@ class UpdateLowStockProducts(graphene.Mutation):
 
 class Query(graphene.ObjectType):
     hello = graphene.String(description="Simple hello field")
-    customers = graphene.ConnectionField(
-        CustomerNode, filter=CustomerFilterInput(), order_by=graphene.List(graphene.String)
-    )
-    products = graphene.ConnectionField(
-        ProductNode, filter=ProductFilterInput(), order_by=graphene.List(graphene.String)
-    )
-    orders = graphene.ConnectionField(
-        OrderNode, filter=OrderFilterInput(), order_by=graphene.List(graphene.String)
-    )
+    # Legacy hello retained; introduce filtered connection fields using django-filter
+    all_customers = DjangoFilterConnectionField(CustomerNode, filterset_class=CustomerFilterSet)
+    all_products = DjangoFilterConnectionField(ProductNode, filterset_class=ProductFilterSet)
+    all_orders = DjangoFilterConnectionField(OrderNode, filterset_class=OrderFilterSet)
     customers_count = graphene.Int(name='customersCount')
     orders_count = graphene.Int(name='ordersCount')
     orders_revenue = graphene.Float(name='ordersRevenue')
@@ -310,60 +307,7 @@ class Query(graphene.ObjectType):
     def resolve_hello(root, info):
         return "Hello, GraphQL!"
 
-    def resolve_customers(root, info, filter=None, order_by=None, **kwargs):  # noqa: A002
-        qs = Customer.objects.all()
-        if filter:
-            if filter.get("name_icontains"):
-                qs = qs.filter(name__icontains=filter["name_icontains"])
-            if filter.get("email_icontains"):
-                qs = qs.filter(email__icontains=filter["email_icontains"])
-            if filter.get("created_at_gte"):
-                qs = qs.filter(created_at__gte=filter["created_at_gte"])
-            if filter.get("created_at_lte"):
-                qs = qs.filter(created_at__lte=filter["created_at_lte"])
-            if pattern := filter.get("phone_pattern"):
-                qs = qs.filter(phone__regex=pattern)
-        if order_by:
-            qs = qs.order_by(*order_by)
-        return qs
-
-    def resolve_products(root, info, filter=None, order_by=None, **kwargs):  # noqa: A002
-        qs = Product.objects.all()
-        if filter:
-            if filter.get("name_icontains"):
-                qs = qs.filter(name__icontains=filter["name_icontains"])
-            if filter.get("price_gte") is not None:
-                qs = qs.filter(price__gte=filter["price_gte"])
-            if filter.get("price_lte") is not None:
-                qs = qs.filter(price__lte=filter["price_lte"])
-            if filter.get("stock_gte") is not None:
-                qs = qs.filter(stock__gte=filter["stock_gte"])
-            if filter.get("stock_lte") is not None:
-                qs = qs.filter(stock__lte=filter["stock_lte"])
-        if order_by:
-            qs = qs.order_by(*order_by)
-        return qs
-
-    def resolve_orders(root, info, filter=None, order_by=None, **kwargs):  # noqa: A002
-        qs = Order.objects.select_related("customer").prefetch_related("products")
-        if filter:
-            if filter.get("total_amount_gte") is not None:
-                qs = qs.filter(total_amount__gte=filter["total_amount_gte"])
-            if filter.get("total_amount_lte") is not None:
-                qs = qs.filter(total_amount__lte=filter["total_amount_lte"])
-            if filter.get("order_date_gte"):
-                qs = qs.filter(order_date__gte=filter["order_date_gte"])
-            if filter.get("order_date_lte"):
-                qs = qs.filter(order_date__lte=filter["order_date_lte"])
-            if filter.get("customer_name"):
-                qs = qs.filter(customer__name__icontains=filter["customer_name"])
-            if filter.get("product_name"):
-                qs = qs.filter(products__name__icontains=filter["product_name"]).distinct()
-            if filter.get("product_id"):
-                qs = qs.filter(products__id=filter["product_id"]).distinct()
-        if order_by:
-            qs = qs.order_by(*order_by)
-        return qs
+    # Use DjangoFilterConnectionField's built-in resolver; no custom resolvers needed here.
 
     def resolve_customers_count(root, info):
         return Customer.objects.count()

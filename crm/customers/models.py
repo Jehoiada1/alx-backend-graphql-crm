@@ -8,7 +8,8 @@ phone_validator = RegexValidator(
 
 
 class Customer(models.Model):
-    name = models.CharField(max_length=255)
+    # Allow blank name for backward compatibility with pre-existing rows
+    name = models.CharField(max_length=255, blank=True, default="")
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=32, blank=True, null=True, validators=[phone_validator])
     created_at = models.DateTimeField(auto_now_add=True)

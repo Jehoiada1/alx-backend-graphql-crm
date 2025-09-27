@@ -3,4 +3,5 @@ from .models import Customer
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("id", "email", "created_at")
+    list_display = ("id", "email", "name", "phone", "created_at")
+    search_fields = ("email", "name", "phone")

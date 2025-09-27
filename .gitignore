@@ -2,13 +2,13 @@
 __pycache__/
 *.py[cod] 
 *.sqlite3
-.env
+.env 
 .venv/
 venv/
 backup/
 
 # Django
-staticfiles/
+staticfiles/ 
 media/
 
 # VS Code
