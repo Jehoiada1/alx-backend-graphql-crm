@@ -297,9 +297,15 @@ class UpdateLowStockProducts(graphene.Mutation):
 class Query(graphene.ObjectType):
     hello = graphene.String(description="Simple hello field")
     # Legacy hello retained; introduce filtered connection fields using django-filter
-    all_customers = DjangoFilterConnectionField(CustomerNode, filterset_class=CustomerFilterSet)
-    all_products = DjangoFilterConnectionField(ProductNode, filterset_class=ProductFilterSet)
-    all_orders = DjangoFilterConnectionField(OrderNode, filterset_class=OrderFilterSet)
+    all_customers = DjangoFilterConnectionField(
+        CustomerNode, filterset_class=CustomerFilterSet, order_by=graphene.List(graphene.String)
+    )
+    all_products = DjangoFilterConnectionField(
+        ProductNode, filterset_class=ProductFilterSet, order_by=graphene.List(graphene.String)
+    )
+    all_orders = DjangoFilterConnectionField(
+        OrderNode, filterset_class=OrderFilterSet, order_by=graphene.List(graphene.String)
+    )
     customers_count = graphene.Int(name='customersCount')
     orders_count = graphene.Int(name='ordersCount')
     orders_revenue = graphene.Float(name='ordersRevenue')
@@ -307,7 +313,23 @@ class Query(graphene.ObjectType):
     def resolve_hello(root, info):
         return "Hello, GraphQL!"
 
-    # Use DjangoFilterConnectionField's built-in resolver; no custom resolvers needed here.
+    def resolve_all_customers(root, info, order_by=None, **kwargs):
+        qs = CustomerFilterSet(data=kwargs, queryset=Customer.objects.all()).qs
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return qs
+
+    def resolve_all_products(root, info, order_by=None, **kwargs):
+        qs = ProductFilterSet(data=kwargs, queryset=Product.objects.all()).qs
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return qs
+
+    def resolve_all_orders(root, info, order_by=None, **kwargs):
+        qs = OrderFilterSet(data=kwargs, queryset=Order.objects.all()).qs
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return qs
 
     def resolve_customers_count(root, info):
         return Customer.objects.count()
