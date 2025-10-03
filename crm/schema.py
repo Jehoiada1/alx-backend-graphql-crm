@@ -80,6 +80,7 @@ class CustomerType(DjangoObjectType):
     class Meta:
         model = Customer
         fields = ("id", "name", "email", "phone", "created_at")
+    created_at = graphene.DateTime(name="createdAt")
 
 
 class ProductType(DjangoObjectType):
@@ -92,9 +93,16 @@ class OrderType(DjangoObjectType):
     class Meta:
         model = Order
         fields = ("id", "order_date", "status", "total_amount", "customer", "products")
+    # Compatibility: allow singular 'product' on mutation return type
+    product = graphene.Field(lambda: ProductType)
+    total_amount = graphene.Float(name="totalAmount")
+    order_date = graphene.DateTime(name="orderDate")
+
+    def resolve_product(self, info):  # pragma: no cover - trivial resolver
+        return self.products.first()
 
 
-class CustomerInput(graphene.InputObjectType):
+class CreateCustomerInput(graphene.InputObjectType):
     name = graphene.String(required=True)
     email = graphene.String(required=True)
     phone = graphene.String(required=False)
@@ -102,7 +110,7 @@ class CustomerInput(graphene.InputObjectType):
 
 class CreateCustomer(graphene.Mutation):
     class Arguments:
-        input = CustomerInput(required=True)
+        input = CreateCustomerInput(required=True)
 
     customer = graphene.Field(CustomerType)
     message = graphene.String()
@@ -128,7 +136,7 @@ class CreateCustomer(graphene.Mutation):
 
 class BulkCreateCustomers(graphene.Mutation):
     class Arguments:
-        input = graphene.List(graphene.NonNull(CustomerInput), required=True)
+        input = graphene.List(graphene.NonNull(CreateCustomerInput), required=True)
 
     customers = graphene.List(CustomerType)
     errors = graphene.List(graphene.String)
@@ -161,7 +169,7 @@ class BulkCreateCustomers(graphene.Mutation):
         )
 
 
-class ProductInput(graphene.InputObjectType):
+class CreateProductInput(graphene.InputObjectType):
     name = graphene.String(required=True)
     price = graphene.Float(required=True)
     stock = graphene.Int(required=False, default_value=0)
@@ -169,7 +177,7 @@ class ProductInput(graphene.InputObjectType):
 
 class CreateProduct(graphene.Mutation):
     class Arguments:
-        input = ProductInput(required=True)
+        input = CreateProductInput(required=True)
 
     product = graphene.Field(ProductType)
     success = graphene.Boolean()
@@ -197,7 +205,7 @@ class CreateProduct(graphene.Mutation):
         return CreateProduct(success=True, product=product, errors=None, message="Product created")
 
 
-class OrderInput(graphene.InputObjectType):
+class CreateOrderInput(graphene.InputObjectType):
     customerId = graphene.ID(required=True)
     productIds = graphene.List(graphene.NonNull(graphene.ID), required=True)
     orderDate = graphene.DateTime(required=False)
@@ -205,7 +213,7 @@ class OrderInput(graphene.InputObjectType):
 
 class CreateOrder(graphene.Mutation):
     class Arguments:
-        input = OrderInput(required=True)
+        input = CreateOrderInput(required=True)
 
     order = graphene.Field(OrderType)
     success = graphene.Boolean()
