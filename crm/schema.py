@@ -24,6 +24,8 @@ class CustomerNode(DjangoObjectType):
         interfaces = (relay.Node,)
         fields = ("id", "name", "email", "phone", "created_at")
 
+    created_at = graphene.DateTime(name="createdAt")
+
 
 class ProductNode(DjangoObjectType):
     class Meta:
@@ -39,6 +41,9 @@ class OrderNode(DjangoObjectType):
         model = Order
         interfaces = (relay.Node,)
         fields = ("id", "order_date", "status", "total_amount", "customer", "products")
+
+    total_amount = graphene.Float(name="totalAmount")
+    order_date = graphene.DateTime(name="orderDate")
 
     def resolve_product(self, info):  # pragma: no cover - trivial resolver
         return self.products.first()
@@ -254,19 +259,22 @@ class UpdateLowStockProducts(graphene.Mutation):
 
 class Query(graphene.ObjectType):
     hello = graphene.String(description="Simple hello field")
-    # Filtered connection fields with nested 'filter' input and optional orderBy
-    all_customers = graphene.ConnectionField(
+    # Filtered connection fields using DjangoFilterConnectionField, with extra nested filter input and orderBy
+    all_customers = DjangoFilterConnectionField(
         CustomerNode,
+        filterset_class=CustomerFilterSet,
         filter=CustomerFilterInput(),
         order_by=graphene.Argument(graphene.String, name="orderBy"),
     )
-    all_products = graphene.ConnectionField(
+    all_products = DjangoFilterConnectionField(
         ProductNode,
+        filterset_class=ProductFilterSet,
         filter=ProductFilterInput(),
         order_by=graphene.Argument(graphene.String, name="orderBy"),
     )
-    all_orders = graphene.ConnectionField(
+    all_orders = DjangoFilterConnectionField(
         OrderNode,
+        filterset_class=OrderFilterSet,
         filter=OrderFilterInput(),
         order_by=graphene.Argument(graphene.String, name="orderBy"),
     )
