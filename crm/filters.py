@@ -25,7 +25,8 @@ class CustomerFilter(filters.FilterSet):
 
     class Meta:
         model = Customer
-    fields = ["name", "email", "created_at_gte", "created_at_lte", "phone_pattern"]
+        # No auto-generated filters; we declare everything explicitly above
+        fields = []
 
 
 class ProductFilter(filters.FilterSet):
@@ -44,7 +45,7 @@ class ProductFilter(filters.FilterSet):
 
     class Meta:
         model = Product
-    fields = ["name", "price_gte", "price_lte", "stock_gte", "stock_lte"]
+        fields = []
 
 
 class OrderFilter(filters.FilterSet):
@@ -65,15 +66,7 @@ class OrderFilter(filters.FilterSet):
 
     class Meta:
         model = Order
-        fields = [
-            "total_amount_gte",
-            "total_amount_lte",
-            "order_date_gte",
-            "order_date_lte",
-            "customer_name",
-            "product_name",
-            "product_id",
-        ]
+        fields = []
 
     def filter_queryset(self, queryset):
         qs = super().filter_queryset(queryset)
