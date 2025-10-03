@@ -70,7 +70,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 GRAPHENE = {
-    'SCHEMA': 'graphql_crm.schema.schema'
+    'SCHEMA': 'alx_backend_graphql_crm.schema.schema'
 }
 
 # Cron jobs (tasks 2 and 3)
