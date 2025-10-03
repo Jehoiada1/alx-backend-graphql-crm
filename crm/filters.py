@@ -74,3 +74,8 @@ class OrderFilter(filters.FilterSet):
             "product_name",
             "product_id",
         ]
+
+    def filter_queryset(self, queryset):
+        qs = super().filter_queryset(queryset)
+        # Ensure uniqueness when filtering via products M2M to avoid duplicate orders
+        return qs.distinct()
