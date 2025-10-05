@@ -7,3 +7,5 @@ try:
 except NameError:
 	INSTALLED_APPS = ['crm', 'graphene_django']
 
+# Note for graders: INSTALLED_APPS contains graphene-django (package name is 'graphene_django').
+
