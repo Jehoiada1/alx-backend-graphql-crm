@@ -65,5 +65,5 @@ STATIC_URL = 'static/'
 
 # Graphene configuration points to our schema entry
 GRAPHENE = {
-    'SCHEMA': 'alx_backend_graphql_crm.schema.schema'
+    'SCHEMA': 'alx_backend_graphql.schema.schema'
 }
