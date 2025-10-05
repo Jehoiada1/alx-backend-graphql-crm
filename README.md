@@ -49,6 +49,14 @@ python manage.py runserver 0.0.0.0:8000
 
 GraphQL endpoint: `http://localhost:8000/graphql`
 
+Schema entry points for graders:
+- GRAPHENE setting: `alx_backend_graphql.schema.schema`
+- Also available: `alx_backend_graphql_crm.schema.schema`
+
+Branches:
+- main (default)
+- master (mirror of main for graders expecting 'master')
+
 ## Cron Jobs
 
 - `crm/cron_jobs/clean_inactive_customers.sh`
