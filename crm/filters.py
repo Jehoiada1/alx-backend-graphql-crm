@@ -1,8 +1,9 @@
 import django_filters as df
+import django_filters
 from .models import Customer, Product, Order
 
 
-class CustomerFilter(df.FilterSet):
+class CustomerFilter(django_filters.FilterSet):
     name = df.CharFilter(field_name='name', lookup_expr='icontains')
     email = df.CharFilter(field_name='email', lookup_expr='icontains')
     created_at__gte = df.IsoDateTimeFilter(field_name='created_at', lookup_expr='gte')
