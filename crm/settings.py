@@ -68,3 +68,6 @@ STATIC_URL = 'static/'
 GRAPHENE = {
     'SCHEMA': 'alx_backend_graphql.schema.schema'
 }
+
+# Modern default PK field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
