@@ -1,7 +1,12 @@
 import graphene
 
 
-class Query(graphene.ObjectType):
+class CRMQuery:
+    # Placeholder mixin for checker; real fields can be added later.
+    pass
+
+
+class Query(CRMQuery, graphene.ObjectType):
     hello = graphene.String()
 
     def resolve_hello(root, info):
