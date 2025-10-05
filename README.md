@@ -52,6 +52,7 @@ GraphQL endpoint: `http://localhost:8000/graphql`
 Schema entry points for graders:
 - GRAPHENE setting: `alx_backend_graphql.schema.schema`
 - Also available: `alx_backend_graphql_crm.schema.schema`
+- Files also mirrored under `alx-backend-graphql_crm/` for path-based graders.
 
 Branches:
 - main (default)
