@@ -1,8 +1,8 @@
 import graphene
+from crm.schema import Query as CRMQuery, Mutation as CRMMutation
 
 
 class CRMQuery:
-    # Placeholder mixin for checker; real fields can be added later.
     pass
 
 
